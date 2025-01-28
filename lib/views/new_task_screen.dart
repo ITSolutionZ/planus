@@ -1,28 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:planus/models/task_model.dart';
 import 'package:table_calendar/table_calendar.dart';
+import '../models/task_model.dart';
 
 class NewTaskScreen extends StatefulWidget {
   const NewTaskScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _NewTaskScreenState createState() => _NewTaskScreenState();
-}
-
-void createTask() {
-  Task newTask = Task(
-    title: "読書",
-    date: DateTime(2025, 1, 3),
-    startTime: "09:00",
-    endTime: "18:00",
-    repeat: "毎週",
-    taskType: "読書",
-    location: "Library",
-    alarm: "15분 전",
-  );
-
-  debugPrint(newTask.toJson().toString());
 }
 
 class _NewTaskScreenState extends State<NewTaskScreen> {
@@ -30,8 +14,12 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   DateTime? _selectedDay;
   TimeOfDay _startTime = const TimeOfDay(hour: 9, minute: 0);
   TimeOfDay _endTime = const TimeOfDay(hour: 18, minute: 0);
-  final String _repeat = '毎週';
+  Repeat _repeat = Repeat.none;
   String _taskType = '読書';
+  final List<String> _taskTypes = [
+    '読書',
+    '学習',
+  ];
 
   void _selectTime(BuildContext context, bool isStartTime) async {
     final pickedTime = await showTimePicker(
@@ -49,6 +37,39 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     }
   }
 
+  void _saveTask() {
+    if (_startTime.hour > _endTime.hour ||
+        (_startTime.hour == _endTime.hour &&
+            _startTime.minute >= _endTime.minute)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('終了時間は開始時間より後である必要があります。'),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    final newTask = Task(
+      title: _taskType,
+      date: _selectedDay ?? _focusedDay,
+      startTime: _startTime.format(context),
+      endTime: _endTime.format(context),
+      repeat: _repeat,
+      taskType: _taskType,
+      location: "読書", // default
+      alarm: "15分前", // default
+    );
+
+    debugPrint(newTask.toJson().toString());
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('タスクが保存されました！'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,37 +77,16 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Row(
-          children: [
-            Icon(Icons.create, color: Colors.black),
-            SizedBox(width: 8),
-            Text(
-              'カレンダー',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        title: const Text(
+          '新しいタスク',
+          style: TextStyle(color: Colors.black, fontSize: 20),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications, color: Colors.black),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Icons.person, color: Colors.black),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 캘린더
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -122,107 +122,82 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                       shape: BoxShape.circle,
                     ),
                   ),
-                  daysOfWeekStyle: const DaysOfWeekStyle(
-                    weekendStyle: TextStyle(color: Colors.red),
-                  ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'Task Title',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 8),
-            // 시작 시간과 종료 시간
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Starts',
-                        style: TextStyle(color: Colors.orange)),
-                    const SizedBox(height: 4),
-                    GestureDetector(
-                      onTap: () => _selectTime(context, true),
-                      child: Text(
-                        '${_selectedDay != null ? _selectedDay!.toLocal().toString().split(' ')[0] : DateTime.now().toLocal().toString().split(' ')[0]} ${_startTime.format(context)}',
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Ends', style: TextStyle(color: Colors.orange)),
-                    const SizedBox(height: 4),
-                    GestureDetector(
-                      onTap: () => _selectTime(context, false),
-                      child: Text(
-                        '${_selectedDay != null ? _selectedDay!.toLocal().toString().split(' ')[0] : DateTime.now().toLocal().toString().split(' ')[0]} ${_endTime.format(context)}',
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
+                _buildTimePicker('Starts', _startTime, true),
+                _buildTimePicker('Ends', _endTime, false),
               ],
             ),
             const SizedBox(height: 16),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Repeat', style: TextStyle(color: Colors.orange)),
-                Text(_repeat, style: const TextStyle(fontSize: 16)),
+                const SizedBox(width: 16),
+                DropdownButton<Repeat>(
+                  value: _repeat,
+                  items: Repeat.values
+                      .map((repeat) => DropdownMenuItem(
+                            value: repeat,
+                            child: Text(repeat.name),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _repeat = value!;
+                    });
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 16),
-            // 태그 버튼
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildTagButton('読書', Colors.orange, _taskType == '読書'),
-                _buildTagButton('学習', Colors.green, _taskType == '学習'),
-              ],
+            Wrap(
+              spacing: 8.0,
+              children: _taskTypes
+                  .map((type) =>
+                      _buildTagButton(type, Colors.orange, _taskType == type))
+                  .toList(),
             ),
             const Spacer(),
-            // 저장 버튼
-            Align(
-              alignment: Alignment.center,
-              child: ElevatedButton(
-                onPressed: () {
-                  // 저장 로직 추가
-                  debugPrint('Task Saved!');
-                },
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: _saveTask,
+                icon: const Icon(Icons.check, color: Colors.white),
+                label: const Text('Save', style: TextStyle(fontSize: 16)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFBCE4A3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.check, color: Colors.white),
-                    SizedBox(width: 8),
-                    Text('Save',
-                        style: TextStyle(color: Colors.white, fontSize: 16)),
-                  ],
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTimePicker(String label, TimeOfDay time, bool isStartTime) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(color: Colors.orange)),
+        const SizedBox(height: 4),
+        GestureDetector(
+          onTap: () => _selectTime(context, isStartTime),
+          child: Text(
+            time.format(context),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
     );
   }
 

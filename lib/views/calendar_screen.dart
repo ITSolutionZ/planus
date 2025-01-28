@@ -1,18 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:planus/main.dart';
+import 'package:planus/views/home_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
-import '../components/custom_bottom_navigation.dart'; // 기존 네비게이션 컴포넌트 사용
+import '../components/custom_bottom_navigation.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _CalendarScreenState createState() => _CalendarScreenState();
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  final Map<DateTime, List<Map<String, dynamic>>> _taskMap = {
+    DateTime.now(): [
+      {'title': 'Task 1 タスク1', 'color': Colors.orange},
+      {'title': 'Task 2 タスク2', 'color': Colors.green},
+    ],
+    DateTime(2023, 12, 25): [
+      {'title': 'クリスマスイベント', 'color': Colors.red},
+    ],
+  };
+
+  List<Map<String, dynamic>> getTasksForDay(DateTime day) {
+    return _taskMap[DateTime(day.year, day.month, day.day)] ?? [];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +64,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // 캘린더 위젯
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -58,8 +71,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: TableCalendar(
-                  firstDay: DateTime.utc(2000, 1, 1),
-                  lastDay: DateTime.utc(2100, 12, 31),
+                  firstDay: DateTime.utc(2020, 1, 1),
+                  lastDay: DateTime.utc(2030, 12, 31),
                   focusedDay: _focusedDay,
                   selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                   onDaySelected: (selectedDay, focusedDay) {
@@ -76,63 +89,28 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     rightChevronIcon:
                         Icon(Icons.chevron_right, color: Colors.orange),
                   ),
-                  calendarStyle: const CalendarStyle(
+                  calendarStyle: CalendarStyle(
                     todayDecoration: BoxDecoration(
-                      color: Color(0xFFFFF3C5),
+                      color: Colors.amberAccent.withOpacity(0.5),
                       shape: BoxShape.circle,
                     ),
-                    selectedDecoration: BoxDecoration(
-                      color: Color(0xFFF5C869),
+                    selectedDecoration: const BoxDecoration(
+                      color: Colors.orangeAccent,
                       shape: BoxShape.circle,
                     ),
-                    weekendTextStyle: TextStyle(color: Colors.red),
-                    holidayTextStyle: TextStyle(color: Colors.blue),
-                  ),
-                  daysOfWeekStyle: const DaysOfWeekStyle(
-                    weekendStyle: TextStyle(color: Colors.red),
                   ),
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            // 오늘의 목표
-            Row(
-              children: [
-                Text(
-                  _selectedDay != null
-                      ? _selectedDay!.day.toString().padLeft(2, '0')
-                      : DateTime.now().day.toString().padLeft(2, '0'),
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Today',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      '今日の目標',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            // 할 일 리스트
             Expanded(
-              child: ListView(
-                children: [
-                  _buildTaskItem('Task 1 タスク1', Colors.orange),
-                  _buildTaskItem('Task 2 タスク2', Colors.green),
-                  _buildTaskItem('Task 3 タスク3', Colors.red),
-                ],
+              child: ListView.builder(
+                itemCount: getTasksForDay(_selectedDay ?? _focusedDay).length,
+                itemBuilder: (context, index) {
+                  final task =
+                      getTasksForDay(_selectedDay ?? _focusedDay)[index];
+                  return _buildTaskItem(task['title'], task['color']);
+                },
               ),
             ),
           ],
@@ -141,32 +119,55 @@ class _CalendarScreenState extends State<CalendarScreen> {
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: 1,
         onTabSelected: (index) {
-          // 탭 이동 로직 추가
-          debugPrint('탭 $index 선택됨');
+          if (index != 1) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) {
+                  if (index == 0) return const HomeScreen();
+                  if (index == 2) {
+                    return const Center(
+                        child: Text('Friends Page')); // dummy page
+                  }
+                  if (index == 3) {
+                    return const Center(
+                        child: Text('Settings Page')); // dummy page
+                  }
+                  return const HomeScreen();
+                },
+              ),
+            );
+          }
         },
       ),
     );
   }
 
   Widget _buildTaskItem(String task, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Row(
+          children: [
+            Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+              ),
             ),
-          ),
-          const SizedBox(width: 16),
-          Text(
-            task,
-            style: const TextStyle(fontSize: 16),
-          ),
-        ],
+            const SizedBox(width: 16),
+            Text(
+              task,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
       ),
     );
   }

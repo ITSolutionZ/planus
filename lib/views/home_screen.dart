@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:planus/views/calendar_screen.dart';
+import '../components/custom_bottom_navigation.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // dummy data for page
+    const String userName = '何なにさん';
+    const int readingCount = 1;
+    const int studyCount = 1;
+    const double progress = 0.75;
+
+    final List<Map<String, dynamic>> taskCards = [
+      {'icon': Icons.menu_book, 'title': 'Reading', 'subtitle': '読書'},
+      {'icon': Icons.school, 'title': 'Study', 'subtitle': '学習'},
+    ];
+
     return Scaffold(
       backgroundColor: const Color(0xFFFDF3E7),
       appBar: AppBar(
@@ -12,7 +25,7 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         title: const Row(
           children: [
-            Icon(Icons.create, color: Colors.black), // 로고 아이콘
+            Icon(Icons.create, color: Colors.black),
             SizedBox(width: 8),
             Text(
               'Plan Us',
@@ -39,20 +52,19 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            // 상단 카드 (Hello, Progress)
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
               color: const Color(0xFFF5C869),
-              child: const Padding(
-                padding: EdgeInsets.all(16.0),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Expanded(
+                        const Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -65,7 +77,7 @@ class HomeScreen extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                '何なにさん！',
+                                '$userName！',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
@@ -74,6 +86,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                               SizedBox(height: 8),
                               Text(
+                                //こちらはあとで、達成率によるコメントに変更
                                 '達成率によるコメント',
                                 style: TextStyle(
                                   fontSize: 14,
@@ -83,33 +96,32 @@ class HomeScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        // 진행률 표시
                         Column(
                           children: [
                             Text(
-                              '2025/01/01',
-                              style: TextStyle(
+                              '${DateTime.now().year}/${DateTime.now().month}/${DateTime.now().day}',
+                              style: const TextStyle(
                                 fontSize: 12,
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 8),
                             Stack(
                               alignment: Alignment.center,
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   width: 60,
                                   height: 60,
                                   child: CircularProgressIndicator(
-                                    value: 0.75,
+                                    value: progress,
                                     backgroundColor: Colors.white30,
                                     color: Colors.white,
                                     strokeWidth: 6,
                                   ),
                                 ),
                                 Text(
-                                  '75%',
-                                  style: TextStyle(
+                                  '${(progress * 100).toInt()}%',
+                                  style: const TextStyle(
                                     fontSize: 14,
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
@@ -121,11 +133,11 @@ class HomeScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
-                    Row(
+                    const SizedBox(height: 16),
+                    const Row(
                       children: [
                         Text(
-                          '学習 : 1',
+                          '学習 : $studyCount',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.white,
@@ -133,7 +145,7 @@ class HomeScreen extends StatelessWidget {
                         ),
                         SizedBox(width: 16),
                         Text(
-                          '読書 : 1',
+                          '読書 : $readingCount',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.white,
@@ -146,28 +158,27 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            // 중단 카드 (Reading, Study)
+            // task card grid
             Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 3 / 4,
-                children: [
-                  _buildTaskCard(
-                    icon: Icons.menu_book,
-                    title: 'Reading',
-                    subtitle: '読書',
-                  ),
-                  _buildTaskCard(
-                    icon: Icons.school,
-                    title: 'Study',
-                    subtitle: '学習',
-                  ),
-                ],
+              child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 3 / 4,
+                ),
+                itemCount: taskCards.length,
+                itemBuilder: (context, index) {
+                  final task = taskCards[index];
+                  return _buildTaskCard(
+                    icon: task['icon'],
+                    title: task['title'],
+                    subtitle: task['subtitle'],
+                  );
+                },
               ),
             ),
-            // 하단 메시지 박스
+            // msgbox
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -192,41 +203,25 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.home, color: Colors.orange),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.calendar_today, color: Colors.grey),
-              onPressed: () {},
-            ),
-            FloatingActionButton(
-              onPressed: () {},
-              backgroundColor: const Color(0xFFBCE4A3),
-              child: const Icon(Icons.add, color: Colors.white),
-            ),
-            IconButton(
-              icon: const Icon(Icons.people, color: Colors.grey),
-              onPressed: () {},
-            ),
-            IconButton(
-              icon: const Icon(Icons.settings, color: Colors.grey),
-              onPressed: () {},
-            ),
-          ],
-        ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        currentIndex: 0,
+        onTabSelected: (index) {
+          if (index == 1) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const CalendarScreen()),
+            );
+          }
+        },
       ),
     );
   }
 
-  Widget _buildTaskCard(
-      {required IconData icon,
-      required String title,
-      required String subtitle}) {
+  Widget _buildTaskCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
@@ -248,26 +243,12 @@ class HomeScreen extends StatelessWidget {
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const Spacer(),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Done',
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
-                    Icon(Icons.check, color: Colors.green),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Not Yet',
-                        style: TextStyle(fontSize: 12, color: Colors.grey)),
-                    Icon(Icons.close, color: Colors.red),
-                  ],
-                ),
-              ],
+            const Align(
+              alignment: Alignment.bottomRight,
+              child: Text(
+                '詳細を確認する >',
+                style: TextStyle(fontSize: 12, color: Colors.blue),
+              ),
             ),
           ],
         ),

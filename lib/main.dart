@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:planus/views/home_screen.dart';
 import 'package:planus/views/calendar_screen.dart';
+
+import 'package:planus/views/splash_screen.dart';
 import 'components/custom_bottom_navigation.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
 }
 
@@ -13,26 +18,25 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      home: SplashScreen(),
     );
   }
 }
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _HomeScreenState createState() => _HomeScreenState();
+  _MainScreenState createState() => _MainScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    const HomeScreen(), // 홈 화면
-    const CalendarScreen(), // 캘린더 화면
-    const Center(child: Text('Friends Page')),
+    const HomeScreen(),
+    const CalendarScreen(),
+    const Center(child: Text('Groups Page')),
     const Center(child: Text('Settings Page')),
   ];
 
@@ -48,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _currentIndex = index;
             });
           } else {
-            // FloatingActionButton 클릭 시 동작
+            // fAB button tapped
             debugPrint('FAB Clicked!');
           }
         },

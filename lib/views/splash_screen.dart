@@ -6,16 +6,36 @@ class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+
+  static const int splashDuration = 3; // 스플래시 지속 시간 (초)
+
   @override
   void initState() {
     super.initState();
+
+    // 애니메이션 컨트롤러 초기화
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1), // 페이드 애니메이션 시간
+    );
+
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeIn,
+    );
+
+    _controller.forward();
+
+    // 스플래시 화면 지속 후 온보딩 화면으로 이동
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.delayed(const Duration(seconds: 3), () {
+      Future.delayed(const Duration(seconds: splashDuration), () {
         if (mounted) {
           Navigator.pushReplacement(
             context,
@@ -27,29 +47,42 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFFFDF3E7),
+    return Scaffold(
+      backgroundColor: const Color(0xFFFDF3E7),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.create, size: 100, color: Colors.black), // 로고 대체
-            SizedBox(height: 16),
-            Text(
-              'Plan Us',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.create,
+                size: 100,
+                color: Colors.black,
+              ), // 로고
+              SizedBox(height: 16),
+              Text(
+                'Plan Us',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            Spacer(),
-            Text(
-              'Copyrights 2025. ITSolutions. All rights reserved.',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-            SizedBox(height: 16),
-          ],
+              Spacer(),
+              Text(
+                'Copyrights 2025. ITSolutions. All rights reserved.',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );

@@ -45,13 +45,18 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   TextField(
-                    decoration: const InputDecoration(labelText: 'Email'),
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
                     onChanged: (value) => viewModel.setEmail(value),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     decoration: const InputDecoration(
                       labelText: 'Password',
+                      border: OutlineInputBorder(),
                       suffixIcon: Icon(Icons.visibility_off),
                     ),
                     obscureText: true,
@@ -70,7 +75,6 @@ class LoginScreen extends StatelessWidget {
                     text: 'ログイン',
                     onPressed: () {
                       if (viewModel.validateFields()) {
-                        // Home 페이지로 이동
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(

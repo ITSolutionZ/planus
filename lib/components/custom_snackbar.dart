@@ -1,15 +1,47 @@
 import 'package:flutter/material.dart';
 
 class CustomSnackbar {
-  static void show(BuildContext context, String message) {
+  //関連するコンテンツを全て別に記載
+  static void show(
+    BuildContext context,
+    String message, {
+    IconData? icon,
+    Color backgroundColor = Colors.redAccent,
+    Color textColor = Colors.white,
+    int durationSeconds = 3,
+    String? actionLabel,
+    VoidCallback? onAction,
+    bool dismissible = true,
+  }) {
     final snackBar = SnackBar(
-      content: Text(
-        message,
-        style: const TextStyle(color: Colors.white, fontSize: 16),
+      behavior:
+          dismissible ? SnackBarBehavior.floating : SnackBarBehavior.fixed,
+      content: Row(
+        children: [
+          if (icon != null) Icon(icon, color: textColor, size: 24),
+          if (icon != null) const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(color: textColor, fontSize: 16),
+            ),
+          ),
+        ],
       ),
-      backgroundColor: Colors.redAccent,
-      duration: const Duration(seconds: 5), // 5초 후 사라짐
+      backgroundColor: backgroundColor,
+      duration: Duration(seconds: durationSeconds),
+      action: actionLabel != null
+          ? SnackBarAction(
+              label: actionLabel,
+              onPressed: onAction ?? () {},
+              textColor: textColor,
+            )
+          : null,
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  static void hide(BuildContext context) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
   }
 }

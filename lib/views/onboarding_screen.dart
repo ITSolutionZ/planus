@@ -1,18 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:planus/views/login_screen.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/onboarding_viewmodel.dart';
 import '../components/custom_button.dart';
+import 'login_screen.dart';
 
 class OnboardingScreen extends StatelessWidget {
   final PageController _pageController = PageController(initialPage: 0);
 
   OnboardingScreen({super.key});
 
+  // onboarding page data
+  final List<Map<String, String>> _onboardingData = [
+    {
+      'image': 'assets/study_plan.png',
+      'title': '学習プランや読書プラン',
+      'description': '自分のプランを立ててみんなに共有しましょう',
+    },
+    {
+      'image': 'assets/goal_achievement.png',
+      'title': '自分のゴールを達成しよう',
+      'description': '達成したゴールをみんなに褒めてもらおう',
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => OnboardingViewModel(),
+      create: (_) => OnboardingViewModel(totalPages: 3),
       child: Scaffold(
         backgroundColor: const Color(0xFFFDF3E7),
         body: Column(
@@ -20,25 +34,21 @@ class OnboardingScreen extends StatelessWidget {
             Expanded(
               child: Consumer<OnboardingViewModel>(
                 builder: (context, viewModel, _) {
-                  return PageView(
+                  return PageView.builder(
                     controller: _pageController,
                     onPageChanged: (index) {
                       viewModel.updatePage(index);
                     },
-                    children: [
-                      _buildPage(
+                    itemCount: _onboardingData.length,
+                    itemBuilder: (context, index) {
+                      final data = _onboardingData[index];
+                      return _buildPage(
                         context,
-                        image: 'assets/study_plan.png', // 2번째 페이지 이미지
-                        title: '学習プランや読書プラン',
-                        description: '自分のプランを立ててみんなに共有しましょう',
-                      ),
-                      _buildPage(
-                        context,
-                        image: 'assets/goal_achievement.png', // 3번째 페이지 이미지
-                        title: '自分のゴールを達成しよう',
-                        description: '達成したゴールをみんなに褒めてもらおう',
-                      ),
-                    ],
+                        image: data['image']!,
+                        title: data['title']!,
+                        description: data['description']!,
+                      );
+                    },
                   );
                 },
               ),
@@ -48,18 +58,21 @@ class OnboardingScreen extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
                   child: CustomButton(
-                    text: viewModel.currentPage == 0 ? '次へ' : 'スタート',
+                    text: viewModel.currentPage == _onboardingData.length - 1
+                        ? 'スタート'
+                        : '次へ',
                     onPressed: () {
-                      if (viewModel.currentPage == 0) {
+                      if (viewModel.currentPage < _onboardingData.length - 1) {
                         _pageController.nextPage(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeInOut,
                         );
                       } else {
                         Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginScreen()));
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginScreen()),
+                        );
                       }
                     },
                   ),
@@ -81,7 +94,7 @@ class OnboardingScreen extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(image, height: 200), // 이미지 표시
+          Image.asset(image, height: 200),
           const SizedBox(height: 32),
           Text(
             title,

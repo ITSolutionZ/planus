@@ -1,14 +1,15 @@
-// bottom_navigation.dart
 import 'package:flutter/material.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTabSelected;
+  final double fabPosition;
 
   const CustomBottomNavigationBar({
     super.key,
     required this.currentIndex,
     required this.onTabSelected,
+    this.fabPosition = 15,
   });
 
   @override
@@ -17,11 +18,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         Container(
-          height: 70, // 네비게이션 바 높이
+          height: 70,
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border(
-              top: BorderSide(color: Colors.grey[300]!), // 상단 경계선
+              top: BorderSide(color: Colors.grey[300]!),
             ),
           ),
           child: Row(
@@ -39,7 +40,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 icon: Icons.calendar_today,
                 isSelected: currentIndex == 1,
               ),
-              const SizedBox(width: 60), // 중앙 FAB 공간 확보
+              const SizedBox(width: 60), // floating button space
               _buildTabIcon(
                 context,
                 index: 2,
@@ -56,10 +57,10 @@ class CustomBottomNavigationBar extends StatelessWidget {
           ),
         ),
         Positioned(
-          bottom: 15,
+          bottom: fabPosition,
           child: FloatingActionButton(
             onPressed: () {
-              onTabSelected(-1); // 중앙 버튼에 대한 특별한 동작 처리
+              onTabSelected(-1);
             },
             backgroundColor: const Color(0xFFBCE4A3),
             child: const Icon(Icons.add, size: 30, color: Colors.white),
@@ -73,10 +74,18 @@ class CustomBottomNavigationBar extends StatelessWidget {
       {required int index, required IconData icon, required bool isSelected}) {
     return GestureDetector(
       onTap: () => onTabSelected(index),
-      child: Icon(
-        icon,
-        size: 30,
-        color: isSelected ? const Color(0xFFFFA726) : Colors.grey,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFFFF3E0) : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          size: 30,
+          color: isSelected ? const Color(0xFFFFA726) : Colors.grey,
+        ),
       ),
     );
   }
