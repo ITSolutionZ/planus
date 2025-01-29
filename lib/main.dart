@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:planus/views/home_screen.dart';
 import 'package:planus/views/calendar_screen.dart';
-
 import 'package:planus/views/splash_screen.dart';
+import 'package:planus/views/new_task_screen.dart';
+import 'package:planus/viewmodels/new_task_viewmodel.dart';
+import 'package:planus/utils/local_notifications_helper.dart';
 import 'components/custom_bottom_navigation.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await LocalNotificationsHelper
+      .initialize(); //　new taskに記述した local alarm 初期化→こちらはAwaitで実行
   runApp(const MyApp());
 }
 
@@ -16,9 +20,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => NewTaskViewModel()),
+      ],
+      child: const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: SplashScreen(),
+      ),
     );
   }
 }
@@ -52,8 +61,11 @@ class _MainScreenState extends State<MainScreen> {
               _currentIndex = index;
             });
           } else {
-            // fAB button tapped
-            debugPrint('FAB Clicked!');
+            // Floating Action Button 클릭 시 NewTaskScreen으로 이동
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NewTaskScreen()),
+            );
           }
         },
       ),

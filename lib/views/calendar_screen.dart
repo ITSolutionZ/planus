@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:planus/main.dart';
 import 'package:planus/views/home_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
 import '../components/custom_bottom_navigation.dart';
