@@ -14,16 +14,16 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
 
-  static const int splashDuration = 3; // 스플래시 지속 시간 (초)
+  static const int splashDuration = 3;
 
   @override
   void initState() {
     super.initState();
 
-    // 애니메이션 컨트롤러 초기화
+    //　アニメーション初期化
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1), // 페이드 애니메이션 시간
+      duration: const Duration(seconds: 1), // 1秒間のアニメーション
     );
 
     _fadeAnimation = CurvedAnimation(
@@ -33,7 +33,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // 스플래시 화면 지속 후 온보딩 화면으로 이동
+    // Splash screenの表示後、Onboarding screenに遷移
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(seconds: splashDuration), () {
         if (mounted) {
