@@ -106,7 +106,7 @@ class LocalNotificationsHelper {
             UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents:
             repeat != Repeat.none ? matchDateTimeComponents : null,
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );
 
       if (context.mounted) {
