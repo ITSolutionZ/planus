@@ -67,7 +67,7 @@ class LocalNotificationsHelper {
         tzScheduledTime,
         details,
         uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
+            UILocalNotificationDateInterpretation.absoluteTime, androidScheduleMode: AndroidScheduleMode.alarmClock,
       );
 
       // Contextが有効になった場合はアラートを表示　：mounted:Widgetが破壊されているかを確認する
