@@ -61,7 +61,7 @@ class _MainScreenState extends State<MainScreen> {
               _currentIndex = index;
             });
           } else {
-            // Floating Action Button 클릭 시 NewTaskScreen으로 이동
+            // FAB button-> newtask 移動
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const NewTaskScreen()),

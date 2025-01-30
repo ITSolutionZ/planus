@@ -133,64 +133,10 @@ class NewTaskScreen extends StatelessWidget {
                 ))
             .toList(),
         onChanged: (value) {
-          if (value != null) viewModel.setRepeat(value);
+          if (value != null) {
+            viewModel.setRepeat(value);
+          }
         },
-      ),
-    );
-  }
-
-  Widget _buildTaskTypePicker(
-      BuildContext context, NewTaskViewModel viewModel) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildTaskTypeButton(context, '読書', Colors.orange, viewModel),
-        _buildTaskTypeButton(context, '学習', Colors.green, viewModel),
-      ],
-    );
-  }
-
-  Widget _buildTaskTypeButton(BuildContext context, String type, Color color,
-      NewTaskViewModel viewModel) {
-    return ElevatedButton(
-      onPressed: () => viewModel.setTaskType(type),
-      style: ElevatedButton.styleFrom(backgroundColor: color),
-      child: Text(type),
-    );
-  }
-
-  Widget _buildLocationPicker(
-      BuildContext context, NewTaskViewModel viewModel) {
-    return ListTile(
-      leading: const Icon(Icons.location_on, color: Colors.orange),
-      title: const Text('場所選択', style: TextStyle(color: Colors.orange)),
-      trailing: Text(viewModel.location ?? '未設定'),
-      onTap: () async {
-        String? selectedLocation = await _showLocationDialog(context);
-        if (selectedLocation != null) {
-          viewModel.setLocation(selectedLocation);
-        }
-      },
-    );
-  }
-
-  Future<String?> _showLocationDialog(BuildContext context) async {
-    TextEditingController controller = TextEditingController();
-    return showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('場所を入力'),
-        content: TextField(controller: controller),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, null),
-            child: const Text('キャンセル'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, controller.text),
-            child: const Text('保存'),
-          ),
-        ],
       ),
     );
   }
@@ -211,4 +157,64 @@ class NewTaskScreen extends StatelessWidget {
       },
     );
   }
+}
+
+Widget _buildTaskTypePicker(BuildContext context, NewTaskViewModel viewModel) {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: [
+      _buildTaskTypeButton(context, TaskType.reading, Colors.orange, viewModel),
+      _buildTaskTypeButton(context, TaskType.studying, Colors.green, viewModel),
+    ],
+  );
+}
+
+Widget _buildTaskTypeButton(BuildContext context, TaskType type, Color color,
+    NewTaskViewModel viewModel) {
+  return ElevatedButton(
+    onPressed: () => viewModel.setTaskType(type as String),
+    style: ElevatedButton.styleFrom(
+      backgroundColor: viewModel.taskType == type ? color : Colors.grey[300],
+    ),
+    child: Text(type.name),
+  );
+}
+
+Widget _buildLocationPicker(BuildContext context, NewTaskViewModel viewModel) {
+  return ListTile(
+    leading: const Icon(Icons.location_on, color: Colors.orange),
+    title: const Text('場所選択', style: TextStyle(color: Colors.orange)),
+    trailing: Text(viewModel.location ?? '未設定'), // 未設定可能
+    onTap: () async {
+      String? selectedLocation = await _showLocationDialog(context);
+      if (selectedLocation != null) {
+        viewModel.setLocation(selectedLocation);
+      }
+    },
+  );
+}
+
+Future<String?> _showLocationDialog(BuildContext context) async {
+  TextEditingController controller = TextEditingController();
+  return showDialog<String>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('場所'),
+      content: TextField(controller: controller),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, null), // キャンセル時はnull
+          child: const Text('キャンセル'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(
+              context,
+              controller.text.isEmpty
+                  ? null
+                  : controller.text), // 空文字の場合はnull処理
+          child: const Text('保存'),
+        ),
+      ],
+    ),
+  );
 }

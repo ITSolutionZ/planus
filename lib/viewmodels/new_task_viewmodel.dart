@@ -60,13 +60,16 @@ class NewTaskViewModel extends ChangeNotifier {
   void setAlarm(BuildContext context, TimeOfDay alarmTime) {
     _alarm =
         '${alarmTime.hour.toString().padLeft(2, '0')}:${alarmTime.minute.toString().padLeft(2, '0')}';
+// error checking
+    debugPrint("setting repeat : $_repeat");
 
     LocalNotificationsHelper.scheduleNotification(
-      context, // contextを含めて呼び出し
+      context,
       1,
       "タスクリマインダー",
       "予定されたタスクの時間です！",
       alarmTime,
+      _repeat,
     );
 
     notifyListeners();

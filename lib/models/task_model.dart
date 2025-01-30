@@ -35,10 +35,10 @@ class Task {
     //　時刻有効性チェック
     final timeRegex = RegExp(r'^\d{2}:\d{2}$');
     if (!timeRegex.hasMatch(startTime)) {
-      throw ArgumentError('startTime은 HH:mm形式');
+      throw ArgumentError('startTimeは HH:mm形式');
     }
     if (!timeRegex.hasMatch(endTime)) {
-      throw ArgumentError('endTime은 HH:mm 形式');
+      throw ArgumentError('endTimeは HH:mm 形式');
     }
 
     // 開始時間が終了時間より後であることを確認

@@ -2,6 +2,15 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!--アラーム権限セッティング-->
+	<key>NSLocalNotificationUsageDescription</key>
+	<string>アプリが通知を送信するために設定が必要です。</string>
+	<!--backgroundで使用可能-->
+	<key>UIBackgroundModes</key>
+	<array>
+    	<string>fetch</string>
+   		<string>remote-notification</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
