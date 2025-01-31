@@ -33,33 +33,60 @@ class NewTaskScreen extends StatelessWidget {
             ),
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Consumer<NewTaskViewModel>(
-            builder: (context, viewModel, _) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildCalendar(context, viewModel),
-                  _buildTimePicker(
-                      context, 'Starts', viewModel.startTime, true, viewModel),
-                  _buildTimePicker(
-                      context, 'Ends', viewModel.endTime, false, viewModel),
-                  _buildRepeatPicker(context, viewModel),
-                  _buildTaskTypePicker(context, viewModel),
-                  _buildLocationPicker(context, viewModel),
-                  _buildAlarmPicker(context, viewModel),
-                  const Spacer(),
-                  CustomButton(
-                    text: 'Save',
-                    onPressed: () {
-                      viewModel.saveTask();
-                      Navigator.pop(context);
-                    },
-                  ),
-                ],
-              );
-            },
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Consumer<NewTaskViewModel>(
+              builder: (context, viewModel, _) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildCalendar(context, viewModel),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    _buildTimePicker(
+                      context,
+                      'Starts',
+                      viewModel.startTime,
+                      true,
+                      viewModel,
+                    ),
+                    _buildTimePicker(
+                      context,
+                      'Ends',
+                      viewModel.endTime,
+                      false,
+                      viewModel,
+                    ),
+                    _buildRepeatPicker(
+                      context,
+                      viewModel,
+                    ),
+                    _buildTaskTypePicker(
+                      context,
+                      viewModel,
+                    ),
+                    _buildLocationPicker(
+                      context,
+                      viewModel,
+                    ),
+                    _buildAlarmPicker(
+                      context,
+                      viewModel,
+                    ),
+                    const Spacer(),
+                    CustomButton(
+                      text: 'Save',
+                      onPressed: () {
+                        viewModel.saveTask();
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -72,7 +99,7 @@ class NewTaskScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8.0),
         child: TableCalendar(
           firstDay: DateTime.utc(2000, 1, 1),
           lastDay: DateTime.utc(2100, 12, 31),
@@ -81,6 +108,7 @@ class NewTaskScreen extends StatelessWidget {
           onDaySelected: (selectedDay, focusedDay) {
             viewModel.setDate(selectedDay);
           },
+          availableGestures: AvailableGestures.horizontalSwipe,
           headerStyle: const HeaderStyle(
             formatButtonVisible: false,
             titleCentered: true,
@@ -88,6 +116,7 @@ class NewTaskScreen extends StatelessWidget {
             rightChevronIcon: Icon(Icons.chevron_right, color: Colors.orange),
           ),
           calendarStyle: const CalendarStyle(
+            outsideDaysVisible: false,
             todayDecoration: BoxDecoration(
               color: Color(0xFFFFF3C5),
               shape: BoxShape.circle,

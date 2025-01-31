@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:planus/views/community_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:planus/views/home_screen.dart';
 import 'package:planus/views/calendar_screen.dart';
@@ -45,7 +46,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _pages = [
     const HomeScreen(),
     const CalendarScreen(),
-    const Center(child: Text('Groups Page')),
+    const CommunityScreen(),
     const Center(child: Text('Settings Page')),
   ];
 
@@ -61,7 +62,6 @@ class _MainScreenState extends State<MainScreen> {
               _currentIndex = index;
             });
           } else {
-            // FAB button-> newtask 移動
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const NewTaskScreen()),
